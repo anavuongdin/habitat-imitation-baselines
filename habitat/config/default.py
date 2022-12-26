@@ -136,7 +136,7 @@ _C.TASK.PROXIMITY_SENSOR.MAX_DETECTION_RADIUS = 2.0
 # -----------------------------------------------------------------------------
 _C.TASK.SUCCESS = CN()
 _C.TASK.SUCCESS.TYPE = "Success"
-_C.TASK.SUCCESS.SUCCESS_DISTANCE = 0.2
+_C.TASK.SUCCESS.SUCCESS_DISTANCE = 1.0
 # -----------------------------------------------------------------------------
 # SPL MEASUREMENT
 # -----------------------------------------------------------------------------

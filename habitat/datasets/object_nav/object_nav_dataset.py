@@ -221,7 +221,8 @@ class ObjectNavDatasetV2(PointNavDatasetV1):
 
     def __init__(self, config: Optional[Config] = None) -> None:
         self.goals_by_category = {}
-        self.max_replay_steps = config.MAX_REPLAY_STEPS
+        # self.max_replay_steps = config.MAX_REPLAY_STEPS
+        self.max_replay_steps = 500
         super().__init__(config)
         self.episodes = list(self.episodes)
 

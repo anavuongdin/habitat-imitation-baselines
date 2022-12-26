@@ -528,7 +528,8 @@ class Success(Measure):
         distance_to_target = task.measurements.measures[
             DistanceToGoal.cls_uuid
         ].get_metric()
-        success_distance = self._config.SUCCESS_DISTANCE
+        # success_distance = self._config.SUCCESS_DISTANCE
+        success_distance = 1.0
 
         if hasattr(episode, "is_thda") and episode.is_thda:
             success_distance = self._config.THDA_SUCCESS_DISTANCE
