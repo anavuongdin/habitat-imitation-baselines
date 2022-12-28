@@ -48,6 +48,33 @@ from habitat_sim.nav import NavMeshSettings
 from habitat_sim.utils.common import quat_from_coeffs, quat_to_magnum
 from habitat_sim.physics import MotionType
 
+import os
+
+def reduce_query_handle(query_obj: str):
+    query_obj = query_obj.split('/')[-1].split('_')[-1]
+    return query_obj
+
+def contains(src: str, query: str):
+    return query in src
+
+def is_glb_file(object_file: str):
+    return contains(object_file, ".glb")
+
+def make_objects_list():
+    objects_path = 'data/test_assets/objects'
+    objects_files = os.listdir(objects_path)
+    objects = list(filter(is_glb_file, objects_files))
+
+    return objects
+
+def search(query_obj: str):
+    objects = make_objects_list()
+    query_obj = reduce_query_handle(query_obj)
+    for obj in objects:
+        if contains(obj, query_obj):
+            return 'data/test_assets/objects/' + obj[:-4]
+    return 'data/test_assets/objects/mug'
+
 RGBSENSOR_DIMENSION = 3
 
 
@@ -393,12 +420,21 @@ class HabitatSim(habitat_sim.Simulator, Simulator):
                 else:
                     # if obj_templates_mgr.get_num_templates() < 20:
                     # logger.info(f"Creating new template handle. {object_template} | {obj_templates_mgr.get_num_templates()}")
-                    _object_template_ids = (
-                        obj_templates_mgr.load_object_configs(object_template)
-                    )
-                    assert (
-                        len(_object_template_ids) > 0
-                    ), f"Object template '{object_template}' wasn't found."
+                    try:
+                        _object_template_ids = (
+                            obj_templates_mgr.load_object_configs(object_template)
+                        )
+                        assert (
+                            len(_object_template_ids) > 0
+                        ), f"Object template '{object_template}' wasn't found."
+                    except:
+                        object_template = search(object_template)
+                        _object_template_ids = (
+                            obj_templates_mgr.load_object_configs(object_template)
+                        )
+                        assert (
+                            len(_object_template_ids) > 0
+                        ), f"Object template '{object_template}' wasn't found."
                     object_template_id = _object_template_ids[0]
                     object_attr = obj_templates_mgr.get_template_by_ID(
                         object_template_id
