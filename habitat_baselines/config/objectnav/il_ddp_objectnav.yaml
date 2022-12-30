@@ -46,6 +46,11 @@ IL:
     reward_window_size: 50
     sync_frac: 0.6
 
+  MultiStepPolicy:
+    hidden_size: 512
+    num_recurrent_layers: 2
+    predicted_steps: 5
+
 RL:
   SUCCESS_REWARD: 2.5
   SLACK_REWARD: -1e-3

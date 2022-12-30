@@ -24,7 +24,7 @@ from habitat_baselines.il.common.encoders.resnet_encoders import (
 )
 from habitat_baselines.rl.models.rnn_state_encoder import RNNStateEncoder
 from habitat_baselines.common.baseline_registry import baseline_registry
-from habitat_baselines.rl.ppo import Net, Policy
+from habitat_baselines.rl.ppo import Net, MultiStepPolicy
 
 
 class ObjectNavILNet(Net):
@@ -109,6 +109,8 @@ class ObjectNavILNet(Net):
 
             self.embed_sge = model_config.embed_sge
             if self.embed_sge:
+                self.sem_seg_embedding = None
+                self.sge_embedding = None
                 self.task_cat2mpcat40 = torch.tensor(task_cat2mpcat40, device=device)
                 self.mapping_mpcat40_to_goal = np.zeros(
                     max(
@@ -190,8 +192,7 @@ class ObjectNavILNet(Net):
     def _extract_sge(self, observations):
         # recalculating to keep this self-contained instead of depending on training infra
         if "semantic" in observations and "objectgoal" in observations:
-            obj_semantic = observations["semantic"].contiguous().flatten(start_dim=1)
-            
+            obj_semantic = observations["semantic"].contiguous().flatten(start_dim=1)            
             if len(observations["objectgoal"].size()) == 3:
                 observations["objectgoal"] = observations["objectgoal"].contiguous().view(
                     -1, observations["objectgoal"].size(2)
@@ -206,12 +207,11 @@ class ObjectNavILNet(Net):
 
             if len(idx.size()) == 3:
                 idx = idx.squeeze(1)
-
             goal_visible_pixels = (obj_semantic == idx).sum(dim=1)
             goal_visible_area = torch.true_divide(goal_visible_pixels, obj_semantic.size(-1)).float()
             return goal_visible_area.unsqueeze(-1)
 
-    def forward(self, observations, rnn_hidden_states, prev_actions, masks):
+    def forward(self, observations, rnn_hidden_states, prev_actions, masks, is_sge_retain=False):
         r"""
         instruction_embedding: [batch_size x INSTRUCTION_ENCODER.output_size]
         depth_embedding: [batch_size x DEPTH_ENCODER.output_size]
@@ -227,7 +227,6 @@ class ObjectNavILNet(Net):
                 observations["depth"] = depth_obs.contiguous().view(
                     -1, depth_obs.size(2), depth_obs.size(3), depth_obs.size(4)
                 )
-
             depth_embedding = self.depth_encoder(observations)
             x.append(depth_embedding)
 
@@ -241,17 +240,21 @@ class ObjectNavILNet(Net):
             x.append(rgb_embedding)
 
         if self.model_config.USE_SEMANTICS:
-            semantic_obs = observations["semantic"]
-            if len(semantic_obs.size()) == 4:
-                observations["semantic"] = semantic_obs.contiguous().view(
-                    -1, semantic_obs.size(2), semantic_obs.size(3)
-                )
-            if self.embed_sge:
-                sge_embedding = self._extract_sge(observations)
-                x.append(sge_embedding)
+            if not is_sge_retain:
+                semantic_obs = observations["semantic"]
+                if len(semantic_obs.size()) == 4:
+                    observations["semantic"] = semantic_obs.contiguous().view(
+                        -1, semantic_obs.size(2), semantic_obs.size(3)
+                    )
+                if self.embed_sge:
+                    self.sge_embedding = self._extract_sge(observations)
+                    x.append(self.sge_embedding)
 
-            sem_seg_embedding = self.sem_seg_encoder(observations)
-            x.append(sem_seg_embedding)
+                self.sem_seg_embedding = self.sem_seg_encoder(observations)
+                x.append(self.sem_seg_embedding)
+            else:
+                x.append(self.sge_embedding)
+                x.append(self.sem_seg_embedding)
 
         if EpisodicGPSSensor.cls_uuid in observations:
             obs_gps = observations[EpisodicGPSSensor.cls_uuid]
@@ -287,14 +290,13 @@ class ObjectNavILNet(Net):
         
         x = torch.cat(x, dim=1)
         x, rnn_hidden_states = self.state_encoder(x, rnn_hidden_states, masks)
-
         return x, rnn_hidden_states
 
 
 @baseline_registry.register_policy
-class ObjectNavILPolicy(Policy):
+class ObjectNavILPolicy(MultiStepPolicy):
     def __init__(
-        self, observation_space: Space, action_space: Space, model_config: Config
+        self, observation_space: Space, action_space: Space, model_config: Config, multi_step_config
     ):
         super().__init__(
             ObjectNavILNet(
@@ -303,7 +305,8 @@ class ObjectNavILPolicy(Policy):
                 num_actions=action_space.n,
             ),
             action_space.n,
-            no_critic=True
+            no_critic=True,
+            multi_step_cfg=multi_step_config,
         )
 
     @classmethod
@@ -313,5 +316,6 @@ class ObjectNavILPolicy(Policy):
         return cls(
             observation_space=observation_space,
             action_space=action_space,
-            model_config=config.MODEL,            
+            model_config=config.MODEL,
+            multi_step_config=config.IL.MultiStepPolicy,            
         )

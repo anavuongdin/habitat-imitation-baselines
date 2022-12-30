@@ -107,6 +107,7 @@ class ILEnvDDPTrainer(ILEnvTrainer):
             lr=il_cfg.lr,
             eps=il_cfg.eps,
             max_grad_norm=il_cfg.max_grad_norm,
+            multi_step_cfg=self.config.IL.MultiStepPolicy,
         )
 
     @profiling_wrapper.RangeContext("train")

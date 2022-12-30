@@ -4,6 +4,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+import copy
 from typing import Optional, Tuple
 
 import torch
@@ -13,6 +14,8 @@ from torch import optim as optim
 
 from habitat import logger
 from habitat.utils import profiling_wrapper
+
+from habitat_baselines.il.env_based.common.multi_step_conversion import convert_multi_step_actions
 
 
 class ILAgent(nn.Module):
@@ -24,6 +27,7 @@ class ILAgent(nn.Module):
         lr: Optional[float] = None,
         eps: Optional[float] = None,
         max_grad_norm: Optional[float] = None,
+        multi_step_cfg: Optional[dict] = None,
     ) -> None:
 
         super().__init__()
@@ -34,6 +38,7 @@ class ILAgent(nn.Module):
 
         self.max_grad_norm = max_grad_norm
         self.num_envs = num_envs
+        self.predicted_steps = multi_step_cfg.predicted_steps
 
         self.optimizer = optim.Adam(
             list(filter(lambda p: p.requires_grad, model.parameters())),
@@ -44,6 +49,9 @@ class ILAgent(nn.Module):
 
     def forward(self, *x):
         raise NotImplementedError
+    
+    def _get_multi_actions_batch(self, data_generator):
+        pass
 
     def update(self, rollouts) -> Tuple[float, float, float]:
         total_loss_epoch = 0.0
@@ -52,7 +60,7 @@ class ILAgent(nn.Module):
         data_generator = rollouts.recurrent_generator(
             self.num_mini_batch
         )
-        cross_entropy_loss = torch.nn.CrossEntropyLoss(reduction="none")
+        cross_entropy_loss = torch.nn.CrossEntropyLoss(ignore_index=- 100, reduction="none")
         hidden_states = []
 
         for sample in data_generator:
@@ -64,10 +72,11 @@ class ILAgent(nn.Module):
                 masks_batch,
                 idx
             ) = sample
+            multi_step_actions = convert_multi_step_actions(actions_batch, self.predicted_steps)
 
             # Reshape to do in a single forward pass for all steps
             (
-                logits,
+                multi_step_predictions,
                 rnn_hidden_states,
             ) = self.model(
                 obs_batch,
@@ -76,11 +85,7 @@ class ILAgent(nn.Module):
                 masks_batch,
             )
 
-            T, N, _ = actions_batch.shape
-            logits = logits.view(T, N, -1)
-
-            action_loss = cross_entropy_loss(logits.permute(0, 2, 1), actions_batch.squeeze(-1))
-
+            action_loss = cross_entropy_loss(multi_step_predictions.permute(0, 3, 1, 2), multi_step_actions.squeeze(-1).long()).sum(dim=-1)
             self.optimizer.zero_grad()
             inflections_batch = obs_batch["inflection_weight"]
 

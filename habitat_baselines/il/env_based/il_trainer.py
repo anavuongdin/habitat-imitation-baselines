@@ -100,6 +100,7 @@ class ILEnvTrainer(BaseRLTrainer):
             lr=il_cfg.lr,
             eps=il_cfg.eps,
             max_grad_norm=il_cfg.max_grad_norm,
+            multi_step_cfg=self.config.IL.MultiStepPolicy,
         )
 
     def _make_results_dir(self, split="val"):
@@ -585,6 +586,7 @@ class ILEnvTrainer(BaseRLTrainer):
                     test_recurrent_hidden_states,
                     prev_actions,
                     not_done_masks,
+                    is_training=False
                 )
                 current_episode_steps += 1
 
