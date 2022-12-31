@@ -5,5 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 
 from habitat_baselines.il.env_based.policy.resnet_policy import ObjectNavILPolicy
+from habitat_baselines.il.env_based.policy.simple_policy import ObjectNavILSimplePolicy
 
 __all__ = ["ObjectNavILPolicy"]
