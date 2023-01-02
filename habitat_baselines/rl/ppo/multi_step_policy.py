@@ -19,8 +19,6 @@ class MultiStepPolicy(Policy):
     def __init__(self, net, dim_actions, no_critic=False, multi_step_cfg=None):
         super().__init__(net, dim_actions, no_critic=False)
         self.multi_step_cfg = multi_step_cfg
-        # self.action_rnn = nn.GRU(net.model_config.STATE_ENCODER.hidden_size, self.multi_step_cfg.hidden_size, self.multi_step_cfg.num_recurrent_layers)
-        # self.action_fc = nn.Linear(self.multi_step_cfg.hidden_size, net.model_config.STATE_ENCODER.hidden_size)
         self.action_rnn_hidden_states = None
         self.predicted_steps = self.multi_step_cfg.predicted_steps
 
