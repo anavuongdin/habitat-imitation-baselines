@@ -68,7 +68,7 @@ MODEL:
   embed_goal_seg: False
   sem_seg_pred: True
   NO_VISION: False
-  USE_SEMANTICS: True
+  USE_SEMANTICS: False
   USE_PRED_SEMANTICS: True
   SWITCH_TO_PRED_SEMANTICS_UPDATE: 0
   SEMANTIC_ENCODER:
