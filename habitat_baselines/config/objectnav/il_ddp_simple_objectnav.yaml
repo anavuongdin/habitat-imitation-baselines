@@ -11,16 +11,16 @@ TENSORBOARD_DIR: "tb/objectnav/objectnav_mp3d_thda_70k/sem_seg_pred/seed_1/ckpt_
 VIDEO_DIR: "video_dir/objectnav/objectnav_mp3d_thda_70k/sem_seg_pred/seed_1/ckpt_20"
 # To evaluate on all episodes, set this to -1
 TEST_EPISODE_COUNT: 10
-EVAL_CKPT_PATH_DIR: "data/new_checkpoints/objectnav/objectnav_mp3d_thda_70k/sem_seg_pred/seed_1/ckpt.20.pth"
+EVAL_CKPT_PATH_DIR: "data/new_checkpoints/objectnav/objectnav_mp3d_thda_70k/simple/seed_1/ckpt.20.pth"
 SHOW_TOP_DOWN_MAP: False
 NUM_PROCESSES: 8
-CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/objectnav_mp3d_thda_70k/sem_seg_pred/seed_1/"
+CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/objectnav_mp3d_thda_70k/simple/seed_1/"
 OUTPUT_LOG_DIR: data/objectnav/logs
 LOG_INTERVAL: 10
 LOG_METRICS: True
 CHECKPOINT_INTERVAL: 500
 SENSORS: ['RGB_SENSOR', 'SEMANTIC_SENSOR', 'DEPTH_SENSOR']
-RESULTS_DIR: "data/objectnav/results/objectnav_mp3d_thda_70k/sem_seg_pred/{split}/{type}"
+RESULTS_DIR: "data/objectnav/results/objectnav_mp3d_thda_70k/simple/{split}/{type}"
 EVAL_RESUTLS_DIR: "data/objectnav/results/"
 EVAL_SAVE_RESULTS: True
 EVAL_SAVE_RESULTS_INTERVAL: 50
