@@ -242,6 +242,7 @@ class ObjectNavILNet(Net):
         if self.model_config.USE_SEMANTICS:
             if not is_sge_retain:
                 semantic_obs = observations["semantic"]
+                print("Before: ", semantic_obs.data.shape)
                 if len(semantic_obs.size()) == 4:
                     observations["semantic"] = semantic_obs.contiguous().view(
                         -1, semantic_obs.size(2), semantic_obs.size(3)

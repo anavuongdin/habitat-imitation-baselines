@@ -210,6 +210,7 @@ class VisualResnetEncoder(nn.Module):
         trainable=False,
         spatial_output: bool=False,
         use_goal_seg: bool=False,
+        semantic_embedding_size=4,
     ):
         super().__init__()
         self.use_goal_seg = use_goal_seg
@@ -274,6 +275,10 @@ class VisualResnetEncoder(nn.Module):
         obs_depth = observations["depth"]
         obs_rgb = observations["rgb"]
         obs_semantic = observations["semantic"]
+        if len(obs_rgb.size()) == 5:
+            observations["rgb"] = obs_rgb.contiguous().view(
+                -1, obs_rgb.size(2), obs_rgb.size(3), obs_rgb.size(4)
+            )
         if len(obs_semantic.size()) == 5:
             observations["semantic"] = obs_semantic.contiguous().view(
                 -1, obs_semantic.size(2), obs_semantic.size(3), obs_semantic.size(4)
@@ -282,18 +287,16 @@ class VisualResnetEncoder(nn.Module):
             observations["depth"] = obs_depth.contiguous().view(
                 -1, obs_depth.size(2), obs_depth.size(3), obs_depth.size(4)
             )
-        if len(obs_rgb.size()) == 5:
-            observations["rgb"] = obs_rgb.contiguous().view(
-                -1, obs_rgb.size(2), obs_rgb.size(3), obs_rgb.size(4)
-            )
-        
-        if not self.use_goal_seg:
-                categories = observations["semantic"].long() + 1
-                observations["semantic"] = self.semantic_embedder(categories)
-
         if "visual_features" in observations:
             x = observations["visual_features"]
         else:
+            if not self.use_goal_seg:
+                categories = observations["semantic"].long() + 1
+                observations["semantic"] = self.semantic_embedder(categories)
+            if len(observations["semantic"].size()) == 5:
+                observations["semantic"] = observations["semantic"].contiguous().view(
+                    -1, observations["semantic"].size(2), observations["semantic"].size(3), observations["semantic"].size(4)
+                )
             x = self.visual_encoder(observations)
 
         if self.spatial_output:
@@ -381,6 +384,7 @@ class ResnetSemSeqEncoder(nn.Module):
         Returns:
             [BATCH, OUTPUT_SIZE]
         """
+        # print("Before1: ", observations["semantic"].data.shape) # 48, 480, 640 
         obs_semantic = observations["semantic"]
         if len(obs_semantic.size()) == 5:
             observations["semantic"] = obs_semantic.contiguous().view(
@@ -394,8 +398,9 @@ class ResnetSemSeqEncoder(nn.Module):
             if not self.use_goal_seg:
                 categories = observations["semantic"].long() + 1
                 observations["semantic"] = self.semantic_embedder(categories)
+            # print("Mid: ", observations["semantic"].data.shape) # 48, 480, 640, 4
             x = self.visual_encoder(observations)
-
+        # print("After1: ", observations["semantic"].data.shape) # 48, 480, 640, 4
         if self.spatial_output:
             b, c, h, w = x.size()
 

@@ -97,7 +97,7 @@ class ObjectNavILSimpleNet(Net):
 
         sem_seg_output_size = 0
         self.semantic_predictor = None
-        self.is_thda = False
+        self.is_thda = True
         if model_config.USE_SEMANTICS:
             sem_embedding_size = model_config.SEMANTIC_ENCODER.embedding_size
 
@@ -128,6 +128,7 @@ class ObjectNavILSimpleNet(Net):
             if self.embed_sge:
                 self.sem_seg_embedding = None
                 self.sge_embedding = None
+                self.visual_embedding = None
                 self.task_cat2mpcat40 = torch.tensor(task_cat2mpcat40, device=device)
                 self.mapping_mpcat40_to_goal = np.zeros(
                     max(
@@ -209,6 +210,7 @@ class ObjectNavILSimpleNet(Net):
     def _extract_sge(self, observations):
         # recalculating to keep this self-contained instead of depending on training infra
         if "semantic" in observations and "objectgoal" in observations:
+            print("JOKER: ", observations["objectgoal"].data.shape, observations["semantic"].data.shape)
             obj_semantic = observations["semantic"].contiguous().flatten(start_dim=1)            
             if len(observations["objectgoal"].size()) == 3:
                 observations["objectgoal"] = observations["objectgoal"].contiguous().view(
@@ -257,16 +259,18 @@ class ObjectNavILSimpleNet(Net):
             x.append(rgb_embedding)
 
         if self.visual_encoder is not None:
-            if len(depth_obs.size()) == 5:
-                observations["depth"] = depth_obs.contiguous().view(
-                    -1, depth_obs.size(2), depth_obs.size(3), depth_obs.size(4)
-                )
+            if not is_sge_retain:
+                if len(depth_obs.size()) == 5:
+                    observations["depth"] = depth_obs.contiguous().view(
+                        -1, depth_obs.size(2), depth_obs.size(3), depth_obs.size(4)
+                    )
 
-            visual_embedding = self.visual_encoder(observations)
-            x.append(visual_embedding)
+                self.visual_embedding = self.visual_encoder(observations)
+            x.append(self.visual_embedding)
 
         if self.model_config.USE_SEMANTICS:
             if not is_sge_retain:
+                print("Before: ", observations["semantic"].data.shape)
                 semantic_obs = observations["semantic"]
                 if len(semantic_obs.size()) == 4:
                     observations["semantic"] = semantic_obs.contiguous().view(

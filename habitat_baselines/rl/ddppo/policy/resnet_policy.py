@@ -172,7 +172,7 @@ class ResNetEncoder(nn.Module):
     def forward(self, observations: Dict[str, torch.Tensor]) -> torch.Tensor:  # type: ignore
         if self.is_blind:
             return None
-
+        
         cnn_input = []
         if self._n_input_rgb > 0:
             rgb_observations = observations["rgb"]
