@@ -262,6 +262,21 @@ class ILEnvTrainer(BaseRLTrainer):
     @profiling_wrapper.RangeContext("_update_agent")
     def _update_agent(self, ppo_cfg, rollouts):
         t_update_model = time.time()
+        with torch.no_grad():
+            last_observation = {
+                k: v[rollouts.step] for k, v in rollouts.observations.items()
+            }
+            next_value = self.policy.get_value(
+                last_observation,
+                rollouts.recurrent_hidden_states[0],
+                rollouts.prev_actions[rollouts.step],
+                rollouts.masks[rollouts.step],
+            ).detach()
+
+        rollouts.to(self.device)
+        rollouts.compute_returns(
+            next_value
+        )
 
         total_loss, rnn_hidden_states = self.agent.update(rollouts)
 

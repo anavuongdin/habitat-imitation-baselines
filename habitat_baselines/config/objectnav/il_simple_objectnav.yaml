@@ -51,6 +51,7 @@ IL:
     hidden_size: 512
     num_recurrent_layers: 2
     predicted_steps: 5
+    il_prob: 0.6
 
 RL:
   SUCCESS_REWARD: 2.5
@@ -101,7 +102,7 @@ MODEL:
     trainable: True
     ddppo_checkpoint: "NONE"
   STATE_ENCODER:
-    hidden_size: 2048
+    hidden_size: 1024
     rnn_type: "GRU"
     num_recurrent_layers: 2
   SEQ2SEQ:
