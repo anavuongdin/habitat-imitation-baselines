@@ -510,6 +510,7 @@ class Success(Measure):
     ):
         self._sim = sim
         self._config = config
+        self._counter = 0
 
         super().__init__()
 
@@ -517,6 +518,7 @@ class Success(Measure):
         return self.cls_uuid
 
     def reset_metric(self, episode, task, *args: Any, **kwargs: Any):
+        self._counter = 0
         task.measurements.check_measure_dependencies(
             self.uuid, [DistanceToGoal.cls_uuid]
         )
@@ -525,6 +527,7 @@ class Success(Measure):
     def update_metric(
         self, episode, task: EmbodiedTask, *args: Any, **kwargs: Any
     ):
+        self._counter += 1
         distance_to_target = task.measurements.measures[
             DistanceToGoal.cls_uuid
         ].get_metric()
@@ -537,6 +540,9 @@ class Success(Measure):
         if (
             hasattr(task, "is_stop_called")
             and task.is_stop_called  # type: ignore
+            and distance_to_target < success_distance
+        ) or (
+            self._counter >= 500
             and distance_to_target < success_distance
         ):
             self._metric = 1.0

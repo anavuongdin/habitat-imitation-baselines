@@ -281,6 +281,12 @@ class ResNet(nn.Module):
         return x
 
 
+def resnet10(in_channels, base_planes, ngroups, dropout_prob=0.0):
+    model = ResNet(in_channels, base_planes, ngroups, BasicBlock, [1, 1, 1, 1])
+
+    return model
+
+
 def resnet18(in_channels, base_planes, ngroups, dropout_prob=0.0):
     model = ResNet(in_channels, base_planes, ngroups, BasicBlock, [2, 2, 2, 2])
 

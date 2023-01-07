@@ -13,12 +13,12 @@ VIDEO_DIR: "video_dir/objectnav/simple/rgbd/seed_1/"
 TEST_EPISODE_COUNT: 50
 EVAL_CKPT_PATH_DIR: "data/new_checkpoints/objectnav/objectnav_env_v4/rgbd/seed_1_70M/ckpt.22.pth"
 SHOW_TOP_DOWN_MAP: False
-NUM_PROCESSES: 3
+NUM_PROCESSES: 8
 CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/simple/rgbd/seed_1"
 OUTPUT_LOG_DIR: data/objectnav/logs
 LOG_INTERVAL: 10
 LOG_METRICS: True
-CHECKPOINT_INTERVAL: 100
+CHECKPOINT_INTERVAL: 500
 SENSORS: ['RGB_SENSOR', 'SEMANTIC_SENSOR', 'DEPTH_SENSOR']
 RESULTS_DIR: "data/objectnav/results/{split}/{type}"
 EVAL_RESUTLS_DIR: "data/objectnav/results/"
