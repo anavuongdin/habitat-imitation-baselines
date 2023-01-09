@@ -20,7 +20,7 @@ LOG_INTERVAL: 10
 LOG_METRICS: True
 CHECKPOINT_INTERVAL: 500
 SENSORS: ['RGB_SENSOR', 'SEMANTIC_SENSOR', 'DEPTH_SENSOR']
-RESULTS_DIR: "data/objectnav/results/objectnav_mp3d_thda_70k/simple/{split}/{type}"
+RESULTS_DIR: "data/objectnav/results/objectnav_mp3d_thda_70k/hybrid/{split}/{type}"
 EVAL_RESUTLS_DIR: "data/objectnav/results/"
 EVAL_SAVE_RESULTS: True
 EVAL_SAVE_RESULTS_INTERVAL: 50

@@ -14,7 +14,7 @@ TEST_EPISODE_COUNT: 50
 EVAL_CKPT_PATH_DIR: "data/new_checkpoints/objectnav/objectnav_env_v4/rgbd/seed_1_70M/ckpt.22.pth"
 SHOW_TOP_DOWN_MAP: False
 NUM_PROCESSES: 10
-CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/simple/rgbd/seed_1"
+CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/hybrid/rgbd/seed_1"
 OUTPUT_LOG_DIR: data/objectnav/logs
 LOG_INTERVAL: 10
 LOG_METRICS: True
