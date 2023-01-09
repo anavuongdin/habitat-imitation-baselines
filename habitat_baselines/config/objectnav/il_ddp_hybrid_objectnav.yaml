@@ -4,7 +4,7 @@
 BASE_TASK_CONFIG_PATH: "configs/tasks/objectnav_mp3d_il.yaml"
 TRAINER_NAME: "ddp-il-trainer"
 ENV_NAME: NavRLEnv
-SIMULATOR_GPU_ID: 0
+SIMULATOR_GPU_ID: 1
 TORCH_GPU_ID: 0
 VIDEO_OPTION: []
 TENSORBOARD_DIR: "tb/objectnav/objectnav_mp3d_thda_70k/sem_seg_pred/seed_1/ckpt_20"
