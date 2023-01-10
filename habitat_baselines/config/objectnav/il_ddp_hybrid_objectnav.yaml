@@ -101,7 +101,7 @@ MODEL:
     trainable: True
     ddppo_checkpoint: "NONE"
   STATE_ENCODER:
-    hidden_size: 2048
+    hidden_size: 1024
     rnn_type: "GRU"
     num_recurrent_layers: 2
   SEQ2SEQ:
