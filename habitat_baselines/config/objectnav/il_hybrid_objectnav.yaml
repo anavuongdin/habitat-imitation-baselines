@@ -98,7 +98,7 @@ MODEL:
   VISUAL_ENCODER:
     cnn_type: "VisualResnetEncoder"
     output_size: 512
-    backbone: "resnet50"
+    backbone: "resnet18"
     trainable: True
     ddppo_checkpoint: "NONE"
   STATE_ENCODER:
