@@ -18,7 +18,7 @@ CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/hybrid/rgbd/seed_1"
 OUTPUT_LOG_DIR: data/objectnav/logs
 LOG_INTERVAL: 10
 LOG_METRICS: True
-CHECKPOINT_INTERVAL: 500
+CHECKPOINT_INTERVAL: 1000
 SENSORS: ['RGB_SENSOR', 'SEMANTIC_SENSOR', 'DEPTH_SENSOR']
 RESULTS_DIR: "data/objectnav/results/{split}/{type}"
 EVAL_RESUTLS_DIR: "data/objectnav/results/"
