@@ -142,6 +142,7 @@ class ILAgent(nn.Module):
         value_loss_epoch = 0.0
         action_loss_epoch = 0.0
         dist_entropy_epoch = 0.0
+        hidden_states = []
 
         for _e in range(self.ppo_epoch):
             profiling_wrapper.range_push("PPO.update epoch")
@@ -167,7 +168,7 @@ class ILAgent(nn.Module):
                     values,
                     action_log_probs,
                     dist_entropy,
-                    _,
+                    rnn_hidden_states,
                 ) = self.model.evaluate_actions(
                     obs_batch,
                     recurrent_hidden_states_batch,
@@ -217,6 +218,7 @@ class ILAgent(nn.Module):
                 self.before_step()
                 self.optimizer.step()
                 self.after_step()
+                hidden_states.append(rnn_hidden_states)
 
                 value_loss_epoch += value_loss.item()
                 action_loss_epoch += action_loss.item()
@@ -229,9 +231,11 @@ class ILAgent(nn.Module):
         value_loss_epoch /= num_updates
         action_loss_epoch /= num_updates
         dist_entropy_epoch /= num_updates
+        hidden_states = torch.cat(hidden_states, dim=1)
+        print("JOKER: ", hidden_states.data.shape)
 
         # return value_loss_epoch, action_loss_epoch, dist_entropy_epoch
-        return total_loss, recurrent_hidden_states_batch
+        return total_loss, hidden_states
 
     def before_backward(self, loss: Tensor) -> None:
         pass
