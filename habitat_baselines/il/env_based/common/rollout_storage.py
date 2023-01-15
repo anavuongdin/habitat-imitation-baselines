@@ -129,7 +129,9 @@ class RolloutStorage:
             "to be greater than or equal to the number of "
             "trainer mini batches ({}).".format(num_processes, num_mini_batch)
         )
+        print("--IL")
         num_envs_per_batch = num_processes // num_mini_batch
+        print("num_envs_per_batch: ", num_envs_per_batch)
         perm = torch.randperm(num_processes)
         for start_ind in range(0, num_processes, num_envs_per_batch):
             observations_batch = defaultdict(list)
@@ -177,7 +179,7 @@ class RolloutStorage:
             recurrent_hidden_states_batch = torch.stack(
                 recurrent_hidden_states_batch, 1
             )
-
+            print("recurrent_hidden_states_batch: ", recurrent_hidden_states_batch.data.shape)            
             yield (
                 observations_batch,
                 recurrent_hidden_states_batch,
@@ -208,7 +210,9 @@ class RolloutStorage:
             "to be greater than or equal to the number of "
             "trainer mini batches ({}).".format(num_processes, num_mini_batch)
         )
+        print("--PPO")
         num_envs_per_batch = num_processes // num_mini_batch
+        print("num_envs_per_batch: ", num_envs_per_batch)        
         perm = torch.randperm(num_processes)
         for start_ind in range(0, num_processes, num_envs_per_batch):
             observations_batch = defaultdict(list)
@@ -283,7 +287,7 @@ class RolloutStorage:
                 T, N, old_action_log_probs_batch
             )
             adv_targ = self._flatten_helper(T, N, adv_targ)
-
+            print("recurrent_hidden_states_batch: ", recurrent_hidden_states_batch.data.shape)
             yield (
                 observations_batch,
                 recurrent_hidden_states_batch,
