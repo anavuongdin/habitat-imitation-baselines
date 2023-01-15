@@ -7,13 +7,13 @@ ENV_NAME: NavRLEnv
 SIMULATOR_GPU_ID: 0
 TORCH_GPU_ID: 0
 VIDEO_OPTION: []
-TENSORBOARD_DIR: "tb/objectnav/simple/rgbd/seed_1/"
-VIDEO_DIR: "video_dir/objectnav/simple/rgbd/seed_1/"
+TENSORBOARD_DIR: "tb/objectnav/objectnav_mp3d_thda_70k/hybrid"
+VIDEO_DIR: "video_dir/objectnav/hybrid"
 # To evaluate on all episodes, set this to -1
 TEST_EPISODE_COUNT: 50
 EVAL_CKPT_PATH_DIR: "data/new_checkpoints/objectnav/objectnav_env_v4/rgbd/seed_1_70M/ckpt.22.pth"
 SHOW_TOP_DOWN_MAP: False
-NUM_PROCESSES: 10
+NUM_PROCESSES: 8
 CHECKPOINT_FOLDER: "data/new_checkpoints/objectnav/hybrid/rgbd/seed_1"
 OUTPUT_LOG_DIR: data/objectnav/logs
 LOG_INTERVAL: 10
@@ -50,7 +50,7 @@ IL:
   MultiStepPolicy:
     hidden_size: 512
     num_recurrent_layers: 2
-    predicted_steps: 5
+    predicted_steps: 1
     il_prob: 0.6
 
 RL:
@@ -75,7 +75,8 @@ MODEL:
   SWITCH_TO_PRED_SEMANTICS_UPDATE: 0
   SEMANTIC_ENCODER:
     rednet_ckpt: "data/rednet-models/rednet_semmap_mp3d_tuned.pth"
-    cnn_type: "None"
+    cnn_type: "ResnetSemSegEncoder"
+    # cnn_type: "None"
     output_size: 256
     backbone: "resnet18"
     train_encoder: True
@@ -83,26 +84,27 @@ MODEL:
     is_thda: True
     num_classes: 29
   RGB_ENCODER:
-    # cnn_type: "ResnetRGBEncoder"
-    cnn_type: "None"
+    cnn_type: "ResnetRGBEncoder"
+    # cnn_type: "None"
     output_size: 256
     backbone: "resnet18"
     train_encoder: True
   DEPTH_ENCODER:
-    # cnn_type: "VlnResnetDepthEncoder"
-    cnn_type: "None"
+    cnn_type: "VlnResnetDepthEncoder"
+    # cnn_type: "None"
     output_size: 128
     backbone: "resnet50"
     trainable: False
     ddppo_checkpoint: "data/ddppo-models/gibson-2plus-resnet50.pth"
   VISUAL_ENCODER:
-    cnn_type: "VisualResnetEncoder"
+    # cnn_type: "VisualResnetEncoder"
+    cnn_type: "None"
     output_size: 512
-    backbone: "resnet18"
+    backbone: "resnet50"
     trainable: True
     ddppo_checkpoint: "NONE"
   STATE_ENCODER:
-    hidden_size: 1024
+    hidden_size: 2048
     rnn_type: "GRU"
     num_recurrent_layers: 2
   SEQ2SEQ:
