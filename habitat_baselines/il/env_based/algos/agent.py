@@ -120,6 +120,7 @@ class ILAgent(nn.Module):
             self.after_step()
 
             total_loss_epoch += total_loss.item()
+            print("HARLEY: ", rnn_hidden_states.data.shape)
             hidden_states.append(rnn_hidden_states)
 
         profiling_wrapper.range_pop()
@@ -218,7 +219,8 @@ class ILAgent(nn.Module):
                 self.before_step()
                 self.optimizer.step()
                 self.after_step()
-                hidden_states.append(rnn_hidden_states)
+                if _e == 0:
+                    hidden_states.append(rnn_hidden_states)
 
                 value_loss_epoch += value_loss.item()
                 action_loss_epoch += action_loss.item()
@@ -232,7 +234,6 @@ class ILAgent(nn.Module):
         action_loss_epoch /= num_updates
         dist_entropy_epoch /= num_updates
         hidden_states = torch.cat(hidden_states, dim=1)
-        print("JOKER: ", hidden_states.data.shape)
 
         # return value_loss_epoch, action_loss_epoch, dist_entropy_epoch
         return total_loss, hidden_states
