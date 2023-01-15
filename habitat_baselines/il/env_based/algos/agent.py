@@ -120,7 +120,6 @@ class ILAgent(nn.Module):
             self.after_step()
 
             total_loss_epoch += total_loss.item()
-            print("HARLEY: ", rnn_hidden_states.data.shape)
             hidden_states.append(rnn_hidden_states)
 
         profiling_wrapper.range_pop()
